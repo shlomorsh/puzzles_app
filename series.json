@@ -1,0 +1,422 @@
+[
+  {
+    "id": "gregorian_months",
+    "labels": ["חודשים", "GregorianMonths"],
+    "ordered": true,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "calendar",
+    "items": ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"]
+  },
+  {
+    "id": "hebrew_months",
+    "labels": ["חודשי_שנה_עבריים", "HebrewMonths"],
+    "ordered": true,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "calendar",
+    "items": ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+  },
+  {
+    "id": "planets",
+    "labels": ["כוכבי_לכת", "Planets"],
+    "ordered": true,
+    "finite": true,
+    "size": 8,
+    "language": "he",
+    "category": "astronomy",
+    "items": ["חמה", "נוגה", "ארץ", "מאדים", "צדק", "שבתאי", "אורנוס", "נפטון"]
+  },
+  {
+    "id": "zodiac_signs",
+    "labels": ["מזלות", "ZodiacSigns"],
+    "ordered": true,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "astrology",
+    "items": ["טלה", "שור", "תאומים", "סרטן", "אריה", "בתולה", "מאזניים", "עקרב", "קשת", "גדי", "דלי", "דגים"]
+  },
+  {
+    "id": "seasons",
+    "labels": ["עונות", "Seasons"],
+    "ordered": false,
+    "finite": true,
+    "size": 4,
+    "language": "he",
+    "category": "calendar",
+    "items": ["אביב", "קיץ", "סתיו", "חורף"]
+  },
+  {
+    "id": "fingers",
+    "labels": ["אצבעות", "Fingers"],
+    "ordered": true,
+    "finite": true,
+    "size": 5,
+    "language": "he",
+    "category": "body",
+    "items": ["אגודל", "אצבע", "אמה", "קמיצה", "זרת"]
+  },
+  {
+    "id": "weekdays",
+    "labels": ["ימי_השבוע", "Weekdays"],
+    "ordered": true,
+    "finite": true,
+    "size": 7,
+    "language": "he",
+    "category": "calendar",
+    "items": ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"]
+  },
+  {
+    "id": "tastes",
+    "labels": ["טעמים", "Tastes"],
+    "ordered": false,
+    "finite": true,
+    "size": 6,
+    "language": "he",
+    "category": "sensory",
+    "items": ["מתוק", "מלוח", "חמוץ", "מר", "חריף", "אומאמי"]
+  },
+  {
+    "id": "colors",
+    "labels": ["צבעים", "Colors"],
+    "ordered": false,
+    "finite": true,
+    "size": 11,
+    "language": "he",
+    "category": "visual",
+    "items": ["אדום", "כתום", "צהוב", "ירוק", "כחול", "סגול", "ורוד", "חום", "שחור", "לבן", "אפור"]
+  },
+  {
+    "id": "question_words",
+    "labels": ["מילות_שאלה", "QuestionWords"],
+    "ordered": false,
+    "finite": true,
+    "size": 7,
+    "language": "he",
+    "category": "language",
+    "items": ["מי", "מה", "מתי", "איפה", "למה", "איך", "כמה"]
+  },
+  {
+    "id": "numbers_masc",
+    "labels": ["מספרים", "NumbersMasculine"],
+    "ordered": true,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "numbers",
+    "items": ["אחד", "שניים", "שלושה", "ארבעה", "חמישה", "שישה", "שבעה", "שמונה", "תשעה", "עשרה"]
+  },
+  {
+    "id": "numbers_fem",
+    "labels": ["מספרים_נקבה", "NumbersFeminine"],
+    "ordered": true,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "numbers",
+    "items": ["אחת", "שתיים", "שלוש", "ארבע", "חמש", "שש", "שבע", "שמונה", "תשע", "עשר"]
+  },
+  {
+    "id": "tens",
+    "labels": ["עשרות", "Tens"],
+    "ordered": true,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "numbers",
+    "items": ["עשר", "עשרים", "שלושים", "ארבעים", "חמישים", "שישים", "שבעים", "שמונים", "תשעים", "מאה"]
+  },
+  {
+    "id": "kitchen_utensils",
+    "labels": ["כלי_מטבח", "KitchenUtensils"],
+    "ordered": false,
+    "finite": true,
+    "size": 9,
+    "language": "he",
+    "category": "food",
+    "items": ["סכין", "מזלג", "כף", "כפית", "צלחת", "קערה", "מחבת", "סיר", "מכסה"]
+  },
+  {
+    "id": "vegetables",
+    "labels": ["ירקות", "Vegetables"],
+    "ordered": false,
+    "finite": true,
+    "size": 13,
+    "language": "he",
+    "category": "food",
+    "items": ["חציל", "עגבנייה", "מלפפון", "פלפל", "בצל", "שום", "קישוא", "גזר", "תפוח אדמה", "חסה", "כרוב", "סלק", "תרד"]
+  },
+  {
+    "id": "letters_abc_hebrew_sound",
+    "labels": ["אותיות_abc", "ABCLettersHebrewPronunciation"],
+    "ordered": true,
+    "finite": true,
+    "size": 26,
+    "language": "he",
+    "category": "language",
+    "items": ["איי", "בי", "סי", "די", "אי", "אף", "ג'י", "אייץ׳", "איי", "ג׳יי", "קיי", "אל", "אם", "אן", "או", "פי", "קיו", "אר", "אס", "טי", "יו", "וי", "דבליו", "אקס", "וואי", "זד"]
+  },
+  {
+    "id": "pets",
+    "labels": ["חיות_בית", "Pets"],
+    "ordered": false,
+    "finite": true,
+    "size": 7,
+    "language": "he",
+    "category": "animals",
+    "items": ["כלב", "חתול", "דג", "תוכי", "אוגר", "ארנב", "צב"]
+  },
+  {
+    "id": "wild_animals",
+    "labels": ["חיות_בר", "WildAnimals"],
+    "ordered": false,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "animals",
+    "items": ["אריה", "נמר", "פיל", "ג'ירפה", "זברה", "תנין", "קרנף", "ברדלס", "צבוע", "גנו", "איילה", "יען"]
+  },
+  {
+    "id": "currencies",
+    "labels": ["מטבעות", "Currencies"],
+    "ordered": false,
+    "finite": true,
+    "size": 14,
+    "language": "he",
+    "category": "finance",
+    "items": ["שקל", "דולר", "אירו", "לירה שטרלינג", "ין", "יואן", "רופי", "רובל", "פזו", "דינר", "פרנק", "וואן", "קרונה", "לירה טורקית"]
+  },
+  {
+    "id": "playing_cards_faces",
+    "labels": ["קלפים", "PlayingCardFaces"],
+    "ordered": true,
+    "finite": true,
+    "size": 13,
+    "language": "he",
+    "category": "games",
+    "items": ["אס", "שתיים", "שלוש", "ארבע", "חמש", "שש", "שבע", "שמונה", "תשע", "עשר", "נסיך", "מלכה", "מלך"]
+  },
+  {
+    "id": "playing_cards_suits",
+    "labels": ["סדרות", "PlayingCardSuits"],
+    "ordered": false,
+    "finite": true,
+    "size": 4,
+    "language": "he",
+    "category": "games",
+    "items": ["לב אדום", "עלה", "יהלום", "תלתן"]
+  },
+  {
+    "id": "fruits",
+    "labels": ["פירות", "Fruits"],
+    "ordered": false,
+    "finite": true,
+    "size": 13,
+    "language": "he",
+    "category": "food",
+    "items": ["תפוח", "אגס", "בננה", "תפוז", "קלמנטינה", "ענבים", "אבטיח", "מלון", "שזיף", "תות", "מנגו", "קיווי", "רימון"]
+  },
+  {
+    "id": "jewish_holidays_modern",
+    "labels": ["חגים", "IsraeliHolidays"],
+    "ordered": false,
+    "finite": true,
+    "size": 15,
+    "language": "he",
+    "category": "jewish_calendar",
+    "items": ["ראש השנה", "יום כיפור", "סוכות", "שמיני עצרת", "שמחת תורה", "חנוכה", "ט\"ו בשבט", "פורים", "פסח", "יום השואה", "יום הזיכרון", "יום העצמאות", "ל\"ג בעומר", "שבועות", "ט\"ו באב", "תשעה באב"]
+  },
+  {
+    "id": "clothing_items",
+    "labels": ["בגדים", "Clothing"],
+    "ordered": false,
+    "finite": true,
+    "size": 15,
+    "language": "he",
+    "category": "fashion",
+    "items": ["חולצה", "מכנסיים", "מעיל", "סוודר", "ג'קט", "חולצת טי", "גופיה", "שמלות", "חצאית", "נעליים", "סנדלים", "כפכפים", "גרביים", "כובע", "צעיף"]
+  },
+  {
+    "id": "rooms",
+    "labels": ["חדרים", "Rooms"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "home",
+    "items": ["סלון", "מטבח", "חדר שינה", "חדר ילדים", "שירותים", "מקלחת", "מרפסת", "ממ״ד", "מסדרון", "חדר עבודה"]
+  },
+  {
+    "id": "israeli_cities",
+    "labels": ["ערים_בישראל", "IsraeliCities"],
+    "ordered": false,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "geography",
+    "items": ["תל אביב", "ירושלים", "חיפה", "באר שבע", "פתח תקווה", "נתניה", "אשדוד", "אשקלון", "מודיעין", "רעננה", "רמת גן", "הרצליה"]
+  },
+  {
+    "id": "continents",
+    "labels": ["יבשות", "Continents"],
+    "ordered": false,
+    "finite": true,
+    "size": 7,
+    "language": "he",
+    "category": "geography",
+    "items": ["אסיה", "אירופה", "אפריקה", "אמריקה הצפונית", "אמריקה הדרומית", "אוסטרליה", "אנטארקטיקה"]
+  },
+  {
+    "id": "countries",
+    "labels": ["ארצות", "Countries"],
+    "ordered": false,
+    "finite": true,
+    "size": 195,
+    "language": "he",
+    "category": "geography",
+    "items": ["אפגניסטן","אלבניה","אלג'יריה","אנדורה","אנגולה","אנטיגואה וברבודה","ארגנטינה","ארמניה","אוסטרליה","אוסטריה","אזרבייג'ן","באחה מסיקאלי (מקסיקו)","בהאמס","בחריין","בנגלדש","ברבדוס","בלארוס","בלגיה","בליז","בנין","בהוטן","בוליביה","בוסניה והרצגובינה","בוטסואנה","ברזיל","ברוניי","בולגריה","בורקינה פאסו","בורונדי","קמבודיה","קמרון","קנדה","כף ורדה","הרפובליקה המרכז־אפריקאית","צ'אד","צ'ילה","סין","קולומביה","קומורו","הרפובליקה הדמוקרטית של קונגו","קונגו","קוסטה ריקה","חוף השנהב","קרואטיה","קובה","קפריסין","צ'כיה","דנמרק","ג'יבוטי","דומיניקה","הרפובליקה הדומיניקנית","מזרח טימור","אקוודור","מצרים","אל סלבדור","גינאה המשוונית","אריתריאה","אסטוניה","סוואזילנד (אסואטיני)","אתיופיה","פיג'י","פינלנד","צרפת","גברון","גמביה","גאורגיה","גרמניה","גאנה","יוון","גרנדה","גואטמלה","גינאה","גינאה־ביסאו","גיאנה","האיטי","הונדורס","הונגריה","איסלנד","הודו","אינדונזיה","איראן","עיראק","אירלנד","ישראל","איטליה","ג'מייקה","יפן","ירדן","קזחסטן","קניה","קיריבטי","קוסובו","כווית","קירגיזסטן","לאוס","לטביה","לבנון","לסוטו","ליבריה","לוב","ליכטנשטיין","ליטא","לוקסמבורג","מקדוניה הצפונית","מדגסקר","מלבדיו","מלזיה","מלאווי","מלדבות","מאלי","מלטה","האיים מרשל","מאוריטניה","מאוריציוס","מקסיקו","מיקרונזיה","מולדובה","מונקו","מונגוליה","המונטנגרו","מרוקו","מוזמביק","מיאנמר","נמיביה","נאורו","נפאל","הולנד","ניו זילנד","ניקרגואה","ניגריה","צפון קוריאה","נורווגיה","עות'מאנית (טורקיה)","פקיסטן","פלאו","פנמה","פפואה גינאה החדשה","פארגוואי","פרו","פיליפינים","פולין","פורטוגל","צרפתית גינאה","רומניה","רוסיה","רואנדה","סנט קיטס ונוויס","סנט לוסיה","סנט וינסנט וגרנדינים","סמואה","סן מרינו","סאו טומה ופרינסיפה","ערב הסעודית","סנגל","סרביה","סיישל","סיירה לאון","סינגפור","סלובקיה","סלובניה","איי שלמה","סומליה","דרום אפריקה","דרום קוריאה","דרום סודן","ספרד","סרי לנקה","סודאן","סורינאם","סווזילנד","שבדיה","שווייץ","סוריה","טאיוואן","טג'יקיסטן","טנזניה","תאילנד","טוגו","טוקלאו","טוניסיה","טורקיה","טורקמניסטן","טובאלו","אוגנדה","אוקראינה","האיחוד האמירויות","הממלכה המאוחדת","ארצות הברית","אורוגוואי","אוזבקיסטן","ואנואטו","ותיקן","ונצואלה","וייטנאם","ים המלח (פלסטין)","זמביה","זימבבואה"]
+  },
+  {
+    "id": "emotions",
+    "labels": ["רגשות", "Emotions"],
+    "ordered": false,
+    "finite": true,
+    "size": 11,
+    "language": "he",
+    "category": "psychology",
+    "items": ["שמחה", "עצב", "כעס", "פחד", "אהבה", "התרגשות", "שעמום", "תסכול", "אכזבה", "קנאה", "רוגע"]
+  },
+  {
+    "id": "biblical_figures",
+    "labels": ["דמויות_תנכיות", "BiblicalFigures"],
+    "ordered": false,
+    "finite": true,
+    "size": 15,
+    "language": "he",
+    "category": "bible",
+    "items": ["אברהם", "יצחק", "יעקב", "משה", "אהרון", "יוסף", "דוד", "שלמה", "שמואל", "שאול", "רות", "אסתר", "דבורה", "אליהו", "אלישע"]
+  },
+  {
+    "id": "books_of_tanach",
+    "labels": ["ספרי_תנך", "TanachBooks"],
+    "ordered": true,
+    "finite": true,
+    "size": 29,
+    "language": "he",
+    "category": "bible",
+    "items": ["בראשית", "שמות", "ויקרא", "במדבר", "דברים", "יהושע", "שופטים", "שמואל א", "שמואל ב", "מלכים א", "מלכים ב", "ישעיהו", "ירמיהו", "יחזקאל", "תרי עשר", "תהילים", "משלי", "איוב", "שיר השירים", "רות", "איכה", "קהלת", "אסתר", "דניאל", "עזרא", "נחמיה", "דברי הימים א", "דברי הימים ב"]
+  },
+  {
+    "id": "twelve_tribes",
+    "labels": ["שבטים", "TwelveTribes"],
+    "ordered": true,
+    "finite": true,
+    "size": 12,
+    "language": "he",
+    "category": "bible",
+    "items": ["ראובן", "שמעון", "לוי", "יהודה", "יששכר", "זבולון", "דן", "נפתלי", "גד", "אשר", "יוסף", "בנימין"]
+  },
+  {
+    "id": "biblical_festivals",
+    "labels": ["מועדים_תנכיים", "BiblicalFestivals"],
+    "ordered": false,
+    "finite": true,
+    "size": 8,
+    "language": "he",
+    "category": "jewish_calendar",
+    "items": ["שבת", "ראש חודש", "פסח", "שבועות", "סוכות", "יום תרועה", "יום כיפור", "שמיני עצרת"]
+  },
+  {
+    "id": "body_parts",
+    "labels": ["איברים", "BodyParts"],
+    "ordered": false,
+    "finite": true,
+    "size": 15,
+    "language": "he",
+    "category": "body",
+    "items": ["ראש", "יד", "רגל", "אצבע", "עין", "אוזן", "אף", "פה", "לב", "כתף", "ברך", "גב", "מרפק", "ברך", "בטן"]
+  },
+  {
+    "id": "senses",
+    "labels": ["חושים", "Senses"],
+    "ordered": true,
+    "finite": true,
+    "size": 5,
+    "language": "he",
+    "category": "body",
+    "items": ["ראייה", "שמיעה", "ריח", "טעם", "מישוש"]
+  },
+  {
+    "id": "geometric_shapes",
+    "labels": ["צורות_גיאומטריות", "GeometricShapes"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "math",
+    "items": ["עיגול", "ריבוע", "משולש", "מלבן", "מחומש", "משושה", "מתומן", "כוכב", "אליפסה", "לב"]
+  },
+  {
+    "id": "materials",
+    "labels": ["חומרים", "Materials"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "science",
+    "items": ["עץ", "ברזל", "זכוכית", "פלסטיק", "בטון", "אבן", "נייר", "גומי", "אלומיניום", "נחושת"]
+  },
+  {
+    "id": "writing_tools",
+    "labels": ["כלי_כתיבה", "WritingTools"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "stationery",
+    "items": ["עיפרון", "עט", "טוש", "מרקר", "עט נובע", "פיילוט", "דיו", "מחק", "סרגל", "מחדד"]
+  },
+  {
+    "id": "snacks",
+    "labels": ["חטיפים", "Snacks"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "food",
+    "items": ["במבה", "ביסלי", "צ'יפס", "שוקולד", "וופל", "עוגייה", "פופקורן", "סוכריות גומי", "אצבע שוקולד", "בר חטיף"]
+  },
+  {
+    "id": "musical_instruments",
+    "labels": ["כלי_נגינה", "MusicalInstruments"],
+    "ordered": false,
+    "finite": true,
+    "size": 10,
+    "language": "he",
+    "category": "music",
+    "items": ["גיטרה", "פסנתר", "כינור", "תופים", "מפוחית", "עוד", "קלרינט", "סקסופון", "חליל", "צ'לו"]
+  },
+  {
+    "id": "idf_ranks",
+    "labels": ["דרגות_בצבא", "IDFRanks"],
+    "ordered": true,
+    "finite": true,
+    "size": 14,
+    "language": "he",
+    "category": "military",
+    "items": ["טוראי", "רב טוראי", "סמל", "סמל ראשון", "רס״ר", "רב סמל מתקדם", "סגן", "סרן", "רס״ן", "סא״ל", "אל״ם", "תא״ל", "אלוף", "רב אלוף"]
+  },
+  {
+    "id": "seven_species",
+    "labels": ["שבעת_המינים", "SevenSpecies"],
+    "ordered": false,
+    "finite": true,
+    "size": 7,
+    "language": "he",
+    "category": "bible",
+    "items": ["חיטה", "שעורה", "גפן", "תאנה", "רימון", "זית", "תמר"]
+  }
+]
