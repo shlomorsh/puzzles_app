@@ -695,4 +695,589 @@ def digit_count_range_puzzle(rng: random.Random) -> Dict:
         "meta": {"start": start, "end": end, "digit": digit},
     }
 
+@register
+def digit_sum_product_puzzle(rng: random.Random) -> Dict:
+    """
+    'השלם את השוויון' – שתי ספרות: התוצאה היא (חיבור הספרות)(כפל הספרות).
+    לדוגמה: 2 3 → 5 6  |  5 8 → 13 40
+    """
+    def encode(n: int) -> str:
+        a, b = map(int, str(n))
+        return f"{a+b}{a*b}"
+
+    # מייצרים 4 משוואות – 3 גלויים ואחד חסר
+    nums = [rng.randint(11, 98) for _ in range(4)]          # ללא אפס מוביל
+    equations = [f"{n} = {encode(n)}" for n in nums[:3]]
+
+    missing = nums[3]
+    answer = encode(missing)
+    question = ", ".join(equations + [f'{missing} = ?'])
+
+    return {
+        "title": "השלם את השוויון",
+        "question": question,
+        "hint": "חבר את הספרות ואחר-כך כפל אותן – חבר את התוצאות כמחרוזת אחת",
+        "answer": answer,
+        "meta": {"rule": "sum_then_product", "missing": missing},
+    }
+
+
+@register
+def digit_ops_combo_puzzle(rng: random.Random) -> Dict:
+    """
+    'השלם את השוויון – גרסה משוגעת'  
+    בוחר אקראית שתי פעולות על הספרות (⊕ , ⊗) ומצמיד את התוצאות.
+    הפעולות האפשריות: סכום, מכפלה, הפרש מוחלט, ריבוע-סכום.
+    לדוגמה: 4 1  (⊕=סכום, ⊗=הפרש)  → 5 3
+    """
+    # מגדירים את הפעולות האפשריות
+    ops = {
+        "sum":       lambda a, b: a + b,
+        "product":   lambda a, b: a * b,
+        "diff":      lambda a, b: abs(a - b),
+        "sum_sq":    lambda a, b: (a + b) ** 2,
+    }
+    op1_name, op2_name = rng.sample(list(ops.keys()), 2)
+    op1, op2 = ops[op1_name], ops[op2_name]
+
+    def encode(n: int) -> str:
+        a, b = map(int, str(n))
+        return f"{op1(a, b)}{op2(a, b)}"
+
+    # שלוש משוואות לדוגמה ואחת חסרה
+    nums = [rng.randint(11, 98) for _ in range(4)]
+    equations = [f"{n} = {encode(n)}" for n in nums[:3]]
+
+    missing = nums[3]
+    answer = encode(missing)
+    question = ", ".join(equations + [f"{missing} = ?"])
+
+    # הסחה קטנה – אפשר להציע גם תשובות שגויות (לא חובה)
+    distractors = {encode(rng.randint(11, 98)) for _ in range(6)}
+    distractors.discard(answer)
+    options = rng.sample(list(distractors), 3) + [answer]
+    rng.shuffle(options)
+
+    return {
+        "title": "בחר את האופציה המתאימה לרשימה",
+        "question": question,
+        "options": options,
+        "hint": f"שתי פעולות מסתתרות: {op1_name} / {op2_name} (בסדר הזה)",
+        "answer": answer,
+        "meta": {"op1": op1_name, "op2": op2_name, "missing": missing},
+    }
+
+@register
+def digit_sum_plus_product_puzzle(rng: random.Random) -> Dict:
+    """
+    'השלם את השוויון' – שתי ספרות: סכום הספרות + מכפלת הספרות.
+    לדוגמה: 5 8 → (5+8) + (5*8) = 13 + 40 = 53
+    """
+    def encode(n: int) -> int:
+        a, b = map(int, str(n))
+        return (a + b) + (a * b)
+
+    # שלוש משוואות מלאות ואחת חסרה
+    nums = [rng.randint(11, 98) for _ in range(4)]   # נמנעים מאפסים מובילים
+    examples = [f"{n} = {encode(n)}" for n in nums[:3]]
+
+    missing = nums[3]
+    answer = encode(missing)
+    question = ", ".join(examples + [f"{missing} = ?"])
+
+    return {
+        "title": "השלם את השוויון",
+        "question": question,
+        "hint": "חבר את הספרות, כפל אותן, ואז חבר את שתי התוצאות",
+        "answer": str(answer),
+        "meta": {"rule": "sum_plus_product", "missing_number": missing},
+    }
+
+
+# מניח שקיים דקורטור register במודול שלכם
+def register(fn):  # מחיקה כשתשתמשו בדקורטור האמיתי
+    return fn
+
+
+# -------------------------------------------------
+# 1. סדרת מספרים חסרה / המשך סדרה
+# -------------------------------------------------
+@register
+def numeric_sequence_missing_puzzle(series: Dict, rng: random.Random,
+                                    all_series: List[Dict] = None) -> Dict:
+    """
+    יוצרת רצף בן 6 איברים עם איבר חסר אחד (?). הסוג נבחר אקראית.
+    """
+    seq_type = rng.choice(["arithmetic", "geometric", "fibonacci"])
+    length = 6
+
+    if seq_type == "arithmetic":
+        start = rng.randint(1, 20)
+        diff = rng.randint(1, 9)
+        seq = [start + i * diff for i in range(length)]
+        rule_desc = f"סדרה חשבונית (דלתא {diff})"
+    elif seq_type == "geometric":
+        start = rng.randint(1, 10)
+        ratio = rng.choice([2, 3])
+        seq = [start * (ratio ** i) for i in range(length)]
+        rule_desc = f"סדרה הנדסית (מכפלה {ratio})"
+    else:  # fibonacci
+        a, b = rng.randint(1, 10), rng.randint(1, 10)
+        seq = [a, b]
+        while len(seq) < length:
+            seq.append(seq[-1] + seq[-2])
+        rule_desc = "פיבונאצ'י"
+
+    hide_idx = rng.randrange(length)
+    answer = seq[hide_idx]
+    display_seq = seq.copy()
+    display_seq[hide_idx] = "?"
+
+    return {
+        "title": "סדרה חסרה – מה המספר החסר?",
+        "question": display_seq,
+        "answer": answer,
+        "hint": f"שימי לב: זו {rule_desc}.",
+        "options": None,
+        "meta": {
+            "seq_type": seq_type,
+            "full_sequence": seq,
+            "hidden_index": hide_idx
+        }
+    }
+
+
+# -------------------------------------------------
+# 2. “משוואות” עם פעולה נסתרת (X ? Y = Z)
+# -------------------------------------------------
+@register
+def hidden_operation_equation_puzzle(series: Dict, rng: random.Random,
+                                     all_series: List[Dict] = None) -> Dict:
+    """
+    יוצר 3 “משוואות” עם כלל נסתר, ומבקש להשלים זוג אחרון.
+    כלל אפשרי: ax + by + c, כאשר a,b,c קבועים אקראיים קטנים.
+    """
+    a, b = rng.randint(1, 5), rng.randint(1, 5)
+    c = rng.randint(-10, 10)
+
+    def op(x, y):
+        return a * x + b * y + c
+
+    # מכינים שלושה זוגות אימון
+    equations = []
+    used_pairs = set()
+    while len(equations) < 3:
+        x, y = rng.randint(1, 20), rng.randint(1, 20)
+        if (x, y) in used_pairs:
+            continue
+        used_pairs.add((x, y))
+        equations.append((x, y, op(x, y)))
+
+    # זוג הבדיקה
+    while True:
+        test_x, test_y = rng.randint(1, 20), rng.randint(1, 20)
+        if (test_x, test_y) not in used_pairs:
+            break
+    answer = op(test_x, test_y)
+
+    # טקסט השאלה
+    lines = [f"{x} ? {y} = {z}" for x, y, z in equations]
+    lines.append(f"{test_x} ? {test_y} = ?")
+
+    return {
+        "title": "גלה את הכלל הנסתר",
+        "question": "\n".join(lines),
+        "answer": answer,
+        "hint": "זו פעולה חשבונית ליניארית על x ו-y (לא כפל פשוט).",
+        "options": None,
+        "meta": {
+            "a": a, "b": b, "c": c,
+            "training_equations": equations,
+            "test_pair": (test_x, test_y)
+        }
+    }
+
+
+# -------------------------------------------------
+# 3. חידה מילולית־מספרית
+# -------------------------------------------------
+@register
+def word_length_number_puzzle(series: Dict, rng: random.Random,
+                              all_series: List[Dict] = None) -> Dict:
+    """
+    נותן רשימת מילים עבריות; המספר הוא מספר האותיות במילה.
+    המשתמש צריך למצוא את המספר המתאים למילה האחרונה.
+    """
+    words = rng.sample([
+        "ירושלים", "תל אביב", "חיפה", "באר שבע",
+        "אשקלון", "נתניה", "הרצליה", "נהריה",
+        "מודיעין", "רחובות", "אילת", "טבריה"
+    ], 4)
+
+    pairs = [(w, len(w.replace(" ", ""))) for w in words]  # בלי רווחים
+    answer_word, answer_num = pairs[-1]
+
+    question_lines = [f"{w} → {n}" for w, n in pairs[:-1]]
+    question_lines.append(f"{answer_word} → ?")
+
+    # מייצר 3 דיסטראקטורים קרובים
+    offsets = [-2, -1, 1, 2]
+    rng.shuffle(offsets)
+    options = [answer_num] + [answer_num + off for off in offsets[:3]]
+    rng.shuffle(options)
+
+    return {
+        "title": "כמה אותיות יש במילה?",
+        "question": "\n".join(question_lines),
+        "answer": answer_num,
+        "hint": "התוצאה היא פשוט אורך המילה (ללא רווחים).",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+
+def register(fn):  # למחיקה כשהדקורטור האמיתי זמין
+    return fn
+
+
+# -------------------------------------------------
+# 4. ספירת תכונה בספרות – כמה ספרות זוגיות?
+# -------------------------------------------------
+@register
+def even_digit_count_puzzle(series: Dict, rng: random.Random,
+                            all_series: List[Dict] = None) -> Dict:
+    nums = []
+    while len(nums) < 4:
+        n = rng.randint(100, 999)
+        if n not in nums:
+            nums.append(n)
+
+    def even_count(x):
+        return sum(1 for d in str(x) if int(d) % 2 == 0)
+
+    pairs = [(n, even_count(n)) for n in nums]
+    answer_num, answer_val = pairs[-1]
+
+    question_lines = [f"{n} → {v}" for n, v in pairs[:-1]]
+    question_lines.append(f"{answer_num} → ?")
+
+    options = [answer_val] + rng.sample(
+        [k for k in range(4) if k != answer_val], 3
+    )
+    rng.shuffle(options)
+
+    return {
+        "title": "כמה ספרות זוגיות?",
+        "question": "\n".join(question_lines),
+        "answer": answer_val,
+        "hint": "ספר (0,2,4,6,8).",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+
+# -------------------------------------------------
+# 5. סכום ספרות
+# -------------------------------------------------
+@register
+def digit_sum_puzzle(series: Dict, rng: random.Random,
+                     all_series: List[Dict] = None) -> Dict:
+    nums = rng.sample(range(200, 999), 4)
+
+    def digit_sum(x):
+        return sum(int(d) for d in str(x))
+
+    pairs = [(n, digit_sum(n)) for n in nums]
+    answer_num, answer_val = pairs[-1]
+
+    lines = [f"{n} → {v}" for n, v in pairs[:-1]]
+    lines.append(f"{answer_num} → ?")
+
+    options = [answer_val] + rng.sample(
+        [digit_sum(rng.randint(100, 999)) for _ in range(20)
+         if digit_sum(_) != answer_val], 3
+    )
+    rng.shuffle(options)
+
+    return {
+        "title": "מה סכום הספרות?",
+        "question": "\n".join(lines),
+        "answer": answer_val,
+        "hint": "פשוט חיבור כל הספרות.",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+
+# -------------------------------------------------
+# 6. מכפלת ספרות
+# -------------------------------------------------
+@register
+def digit_product_puzzle(series: Dict, rng: random.Random,
+                         all_series: List[Dict] = None) -> Dict:
+    nums = rng.sample(range(112, 987), 4)
+
+    def digit_prod(x):
+        prod = 1
+        for d in str(x):
+            prod *= int(d)
+        return prod
+
+    pairs = [(n, digit_prod(n)) for n in nums]
+    answer_num, answer_val = pairs[-1]
+
+    lines = [f"{n} → {v}" for n, v in pairs[:-1]]
+    lines.append(f"{answer_num} → ?")
+
+    distr = []
+    while len(distr) < 3:
+        fake = digit_prod(rng.randint(111, 999))
+        if fake != answer_val:
+            distr.append(fake)
+    options = [answer_val] + distr
+    rng.shuffle(options)
+
+    return {
+        "title": "מכפלת הספרות",
+        "question": "\n".join(lines),
+        "answer": answer_val,
+        "hint": "כפול-כפול-כפול…",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+
+# -------------------------------------------------
+# 7. שילוב סכום + מכפלה בשרשור
+#    דוגמה: 23 → 65  (2+3=5, 2x3=6  → 65)
+# -------------------------------------------------
+@register
+def sum_prod_concat_puzzle(series: Dict, rng: random.Random,
+                           all_series: List[Dict] = None) -> Dict:
+    nums = rng.sample(range(12, 98), 4)  # דו-ספרתי קליל
+
+    def transform(n):
+        a, b = divmod(n, 10)
+        s = a + b
+        p = a * b
+        return int(f"{s}{p}")
+
+    pairs = [(n, transform(n)) for n in nums]
+    answer_num, answer_val = pairs[-1]
+
+    lines = [f"{n} → {v}" for n, v in pairs[:-1]]
+    lines.append(f"{answer_num} → ?")
+
+    options = [answer_val] + rng.sample(
+        [transform(rng.randint(12, 98)) for _ in range(30)
+         if _ != answer_num and transform(_) != answer_val], 3
+    )
+    rng.shuffle(options)
+
+    return {
+        "title": "חבר ואז כפול – בשרשור",
+        "question": "\n".join(lines),
+        "answer": answer_val,
+        "hint": "חיבור הספרות ואז המכפלה, צמודים אחד לשני.",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+
+# -------------------------------------------------
+# 8. שרשור ריבועי ספרות
+#    דוגמה: 45 → 1625  (4²=16, 5²=25)
+# -------------------------------------------------
+@register
+def square_concat_puzzle(series: Dict, rng: random.Random,
+                         all_series: List[Dict] = None) -> Dict:
+    nums = rng.sample(range(12, 98), 4)
+
+    def transform(n):
+        return int("".join(str(int(d) ** 2) for d in str(n)))
+
+    pairs = [(n, transform(n)) for n in nums]
+    answer_num, answer_val = pairs[-1]
+
+    lines = [f"{n} → {v}" for n, v in pairs[:-1]]
+    lines.append(f"{answer_num} → ?")
+
+    fake_vals = set()
+    while len(fake_vals) < 3:
+        x = transform(rng.randint(12, 98))
+        if x != answer_val:
+            fake_vals.add(x)
+    options = [answer_val] + list(fake_vals)
+    rng.shuffle(options)
+
+    return {
+        "title": "שרשור ריבועי ספרות",
+        "question": "\n".join(lines),
+        "answer": answer_val,
+        "hint": "מרובע כל ספרה ומצמידים.",
+        "options": options,
+        "meta": {"pairs": pairs}
+    }
+
+import random
+from typing import Dict, List
+
+def register(fn):  # להסרה כשיש את הדקורטור שלכם
+    return fn
+
+
+# -------------------------------------------------
+# 9. סדרה עם חוק מתחלף:  (-K) , אחר-כך (x-M) , וחוזר חלילה
+#    דוגמה מהמאמר: 1,-4,8,3,-6,-11,22,17,...
+# -------------------------------------------------
+@register
+def alternating_rule_sequence_puzzle(series: Dict, rng: random.Random,
+                                     all_series: List[Dict] = None) -> Dict:
+    """
+    יוצר סדרה באורך 8-10 שבה החוק מתחלף:
+      צעד אי-זוגי: מחסירים K
+      צעד זוגי:   מכפילים ב-(‑M)
+    """
+    length = rng.randint(8, 10)
+    first = rng.randint(1, 9)
+    K = rng.randint(3, 8)          # כמה מחסירים
+    M = rng.choice([2, 3])         # בכמה מכפילים (בסימן שלילי)
+
+    seq = [first]
+    sub = True
+    while len(seq) < length:
+        prev = seq[-1]
+        if sub:
+            seq.append(prev - K)
+        else:
+            seq.append(prev * -M)
+        sub = not sub  # החלפת החוק
+
+    hide_idx = rng.randrange(3, length - 1)  # מסתירים איבר פנימי
+    answer = seq[hide_idx]
+    display = seq.copy()
+    display[hide_idx] = "?"
+
+    return {
+        "title": "סדרה עם חוק מתחלף – מצא את המספר החסר",
+        "question": display,
+        "answer": answer,
+        "hint": f"חוק אחד: -{K}, החוק השני: x{-M} – מתחלפים.",
+        "options": None,
+        "meta": {"K": K, "M": M, "seq": seq, "hidden": hide_idx}
+    }
+
+
+# -------------------------------------------------
+# 10. טבלת קלט/פלט ליניארית (ax + b) – להשלים ערכים חסרים
+#    מבוסס על הדוגמאות 12→10, 62→35, ...
+# -------------------------------------------------
+@register
+def linear_io_table_puzzle(series: Dict, rng: random.Random,
+                           all_series: List[Dict] = None) -> Dict:
+    """
+    יוצר כלל y = ax + b עם a,b שלמים קטנים.
+    מציג 6-7 זוגות, חלקם חסרים, ומבקש למלא.
+    """
+    a = rng.choice([2, 3, 4, -2, -3])
+    b = rng.randint(-10, 10)
+
+    n_rows = 6
+    inputs = rng.sample(range(10, 90), n_rows)
+    rows = []
+    for x in inputs:
+        rows.append([x, a * x + b])
+
+    # מחביאים 2-3 יציאות ואולי כניסה אחת
+    missing_out = rng.sample(range(n_rows), 3)
+    missing_in  = rng.choice(range(n_rows))
+
+    display_rows = []
+    for idx, (x, y) in enumerate(rows):
+        disp_x = "?" if idx == missing_in and rng.random() < 0.4 else x
+        disp_y = "?" if idx in missing_out else y
+        display_rows.append(f"{disp_x} → {disp_y}")
+
+    # האתגר: למצוא y במקום הראשון ברשימת missing_out
+    target_idx = missing_out[0]
+    answer = rows[target_idx][1]
+
+    return {
+        "title": "טבלת קלט-פלט – גלה את הכלל והשלים",
+        "question": "\n".join(display_rows),
+        "answer": answer,
+        "hint": "הכלל ליניארי: y = a·x + b.",
+        "options": None,
+        "meta": {"a": a, "b": b, "rows": rows,
+                 "missing_out": missing_out, "missing_in": missing_in}
+    }
+
+
+# -------------------------------------------------
+# 11. סדרה ריבועית:  n² ± c   (נולדה מה-n²-1 שבמאמר)
+# -------------------------------------------------
+@register
+def quadratic_sequence_puzzle(series: Dict, rng: random.Random,
+                              all_series: List[Dict] = None) -> Dict:
+    """
+    יוצר סדרה באורך 7 לפי הנוסחה  n² ± c  (c קבוע קטן).
+    מסתיר איבר אמצעי.
+    """
+    c = rng.choice([-3, -1, 1, 2, 5])
+    length = 7
+    seq = [(n ** 2) + c for n in range(length)]
+    hide_idx = rng.randrange(2, 5)
+    answer = seq[hide_idx]
+    display = seq.copy()
+    display[hide_idx] = "?"
+
+    sign = "+" if c > 0 else "-"
+    abs_c = abs(c)
+
+    return {
+        "title": "סדרה ריבועית – מה המספר החסר?",
+        "question": display,
+        "answer": answer,
+        "hint": f"האיבר ה-n הוא n² {sign} {abs_c}.",
+        "options": None,
+        "meta": {"c": c, "seq": seq, "hidden": hide_idx}
+    }
+
+
+# -------------------------------------------------
+# 12. כלל דו-שלבי (x a ואז +b) על רצף מספרים לא רציף
+#    כמו 2→7, 3→10, 5→16  (y = 3x+1)
+# -------------------------------------------------
+@register
+def two_step_linear_sequence_puzzle(series: Dict, rng: random.Random,
+                                    all_series: List[Dict] = None) -> Dict:
+    """
+    בוחר a,b (a≠0), מייצר 5-6 זוגות x→y לא רציפים.
+    משתמש בשניים-שלושה זוגות להדגמת הכלל, מסתיר את היתר.
+    """
+    a = rng.choice([2, 3, 4, 5])
+    b = rng.randint(-5, 6)
+
+    xs = rng.sample(range(1, 15), 6)
+    pairs = [(x, a * x + b) for x in xs]
+
+    # מציגים שלושה זוגות מלאים ושניים חסרים
+    rng.shuffle(pairs)
+    known = pairs[:3]
+    hidden = pairs[3:]
+
+    lines = [f"{x} → {y}" for x, y in known]
+    for x, _ in hidden:
+        lines.append(f"{x} → ?")
+
+    answer = hidden[0][1]
+
+    return {
+        "title": "כלל כפול-ואז-חיבור – מצא את ה-y החסר",
+        "question": "\n".join(lines),
+        "answer": answer,
+        "hint": "קודם כופלים במספר קבוע, אחר-כך מוסיפים קבוע נוסף.",
+        "options": None,
+        "meta": {"a": a, "b": b, "pairs": pairs}
+    }
 
