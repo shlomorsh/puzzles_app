@@ -39,10 +39,81 @@ def generate_random_puzzle(rng: random.Random, all_series: List[Dict]) -> Dict:
 
     # מנסה להעביר גם את כל הסדרות לפונקציה במידה והיא דורשת זאת
     try:
-        return puzzle_func(series_entry, rng, all_series=all_series)
+        puzzle = puzzle_func(series_entry, rng, all_series=all_series)
     except TypeError:
         try:
-            return puzzle_func(series_entry, rng)
+            puzzle = puzzle_func(series_entry, rng)
         except TypeError:
             # פונקציות שמקבלות רק rng
-            return puzzle_func(rng)
+            puzzle = puzzle_func(rng)
+    # הוספת שם הפונקציה ל-meta
+    if "meta" in puzzle and isinstance(puzzle["meta"], dict):
+        puzzle["meta"]["func_name"] = puzzle_func.__name__
+    else:
+        puzzle["meta"] = {"func_name": puzzle_func.__name__}
+    return puzzle
+
+
+def debug_puzzle_coverage(all_series):
+    import traceback
+    print("\n--- בדיקת זמינות חידות ---")
+    for i, func in enumerate(puzzle_registry):
+        func_name = func.__name__
+        successes = 0
+        failures = []
+        for s in all_series:
+            try:
+                # ננסה להריץ עם כל הפרמטרים האפשריים
+                try:
+                    func(s, random.Random(), all_series=all_series)
+                except TypeError:
+                    try:
+                        func(s, random.Random())
+                    except TypeError:
+                        func(random.Random())
+                successes += 1
+            except Exception as e:
+                failures.append(f"סדרה: {s.get('id', '?')} | {str(e)}")
+        if successes:
+            print(f"✅ {func_name}: הצליח עבור {successes} סדרות מתוך {len(all_series)}")
+        if failures:
+            print(f"❌ {func_name}: נכשל עבור {len(failures)} סדרות:")
+            for fail in failures:
+                print(f"   - {fail}")
+    print("--- סוף בדיקה ---\n")
+
+
+def list_working_puzzles():
+    """
+    מדפיסה למסוף את שמות כל החידות שנכשלות (לא עובדות) עם פירוט החריגה, עם סדרה דמה.
+    """
+    import random
+    from puzzles import puzzle_registry
+    mock_series = {
+        "id": "mock",
+        "labels": ["דמה"],
+        "items": ["אבא", "אמא", "דוד", "רון", "תמר", "שיר"],
+        "ordered": True,
+        "finite": True
+    }
+    mock_all_series = [
+        mock_series,
+        {"id": "mock2", "labels": ["דמה2"], "items": ["אור", "ים", "טל", "חן", "גל"], "ordered": True, "finite": True},
+        {"id": "countries", "labels": ["מדינות"], "items": ["ישראל", "צרפת", "גרמניה", "ספרד", "איטליה"], "ordered": True, "finite": True}
+    ]
+    print("\n--- חידות שנכשלו (ללא תלות בסדרות) ---")
+    any_failed = False
+    for func in puzzle_registry:
+        try:
+            try:
+                func(mock_series, random.Random(), all_series=mock_all_series)
+            except TypeError:
+                try:
+                    func(mock_series, random.Random())
+                except TypeError:
+                    func(random.Random())
+        except Exception as e:
+            any_failed = True
+            print(f"❌ {func.__name__}: {type(e).__name__}: {e}")
+    if not any_failed:
+        print("(כל החידות נטענות בהצלחה)")

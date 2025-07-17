@@ -3,7 +3,7 @@
 """אוסף פונקציות חידה + Registry אוטומטי"""
 
 import random
-from typing import Dict, Callable, List
+from typing import Dict, Callable, List, Optional
 
 # Registry: כל פונקציית חידה שנרשמת תתווסף לכאן
 puzzle_registry: List[Callable] = []
@@ -95,7 +95,7 @@ def two_letters_puzzle(series: Dict, rng: random.Random) -> Dict:
 # 'בחר את האופציה המתאימה לרשימה' - בגרסת אנגרמות
 # מבנה multiple choice עם 4 אפשרויות (3 הסחות, 1 נכונה).
 @register
-def multiple_choice_anagram_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
+def multiple_choice_anagram_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     if all_series is None:
         raise ValueError("all_series is required for distractors")
 
@@ -142,60 +142,12 @@ def multiple_choice_anagram_puzzle(series: Dict, rng: random.Random, all_series:
     }
 
 
-# 'בחר את האופציה המתאימה לרשימה' - מטמיע מילה קצרה מתוך סדרה בתוך מילה ארוכה.
-# יוצר 4 אפשרויות, רק אחת מכילה טקסט ממוטמן.
-@register
-def embedded_word_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
-    if all_series is None:
-        raise ValueError("all_series is required for distractors")
-
-    items = series["items"]
-    short_word = rng.choice(items)
-
-    mode = rng.choice(["start", "end", "random"])
-    def embed(word: str) -> str:
-        filler = "אבגדהוזחטיכלמנסעפצקרשת"
-        n = rng.randint(3, 6)
-        pad = ''.join(rng.choice(list(filler)) for _ in range(n))
-        if mode == "start":
-            return short_word + pad
-        if mode == "end":
-            return pad + short_word
-        pos = rng.randint(0, len(word))
-        return word[:pos] + short_word + word[pos:]
-
-    pool = []
-    for s in all_series:
-        if s["id"] != series["id"]:
-            pool.extend(s["items"])
-    distractor_words = rng.sample(pool, k=3)
-
-    options = [embed(short_word)]
-    for w in distractor_words:
-        options.append(embed(w))
-    rng.shuffle(options)
-
-    question = ", ".join(options)
-    hint = f"המילה הנכונה כוללת מילת מפתח מתוך {series['labels'][0]}"
-
-    return {
-        "title": "בחר את האופציה המתאימה לרשימה",
-        "question": question,
-        "options": options,
-        "answer": next(opt for opt in options if short_word in opt),
-        "hint": hint,
-        "meta": {
-            "series_id": series["id"],
-            "mode": mode,
-            "short_word": short_word,
-        },
-    }
 
 
 # 'השלם את סימן השאלה' – בוחרת סדרה מתאימה עם מספיק מילים מאותו אורך,
 # בונה מטריצת תווים (transpose), מסתירה אות אחת אקראית ומחזירה את הרצף.
 @register
-def matrix_transpose_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
+def matrix_transpose_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     # מוודא שיש רשימת סדרות עבור בחירה חוזרת
     if all_series is None:
         raise ValueError("all_series is required for series fallback")
@@ -264,7 +216,7 @@ def matrix_transpose_puzzle(series: Dict, rng: random.Random, all_series: List[D
 # 'בחר את האופציה המתאימה לרשימה' – לוקח רשימה Ordered,
 # משנה את מיקום הפסיקים בתוך המילים הראשונות, ממשיך עם המילה הבאה כתשובה.
 @register
-def mispunctuation_word_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
+def mispunctuation_word_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     if not series.get("ordered"):
         raise ValueError("Series must be ordered for this puzzle type")
     items = series["items"]
@@ -310,49 +262,7 @@ def mispunctuation_word_puzzle(series: Dict, rng: random.Random, all_series: Lis
 
 
 @register
-def numeric_sequence_puzzle(rng: random.Random) -> Dict:
-    """
-    'בחר את האופציה המתאימה לרשימה' – מתחיל ממספר אקראי בן 4 ספרות,
-    מפריד לפסקאות אקראיות וממשיך במספר העוקב.
-    """
-    # התחלה רנדומלית
-    start = rng.randint(1000, 9999)
-    seq_nums = [start + i for i in range(4)]
-    # פונקציית פיצול
-    def split_number(n: int) -> str:
-        s = str(n)
-        parts = []
-        i = 0
-        while i < len(s):
-            step = rng.randint(1, len(s) - i)
-            parts.append(s[i:i + step])
-            i += step
-        return ",".join(parts)
-
-    scrambled_seq = [split_number(n) for n in seq_nums]
-    question = ",".join(scrambled_seq)
-
-    correct_num = start + 4
-    scrambled_correct = split_number(correct_num)
-    # הסחות - מספרים נוספים
-    distractors = [split_number(rng.randint(1000, 9999)) for _ in range(3)]
-    options = distractors + [scrambled_correct]
-    rng.shuffle(options)
-
-    hint = "המשך סדרת המספרים לפי הערך הנוסף עם אותה הפסקת ספרות"
-
-    return {
-        "title": "בחר את האופציה המתאימה לרשימה",
-        "question": question,
-        "options": options,
-        "answer": scrambled_correct,
-        "hint": hint,
-        "meta": {"start_number": start},
-    }
-
-
-@register
-def country_anagram_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
+def country_anagram_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'איזו מדינה זו?' – יוצר אנגרמה (ערבוב אותיות) של שם מדינה מתוך series.json
     ומבקש לזהות איזו מדינה הוטמנה.
@@ -397,7 +307,7 @@ def country_anagram_puzzle(series: Dict, rng: random.Random, all_series: List[Di
 
 
 @register
-def letter_shift_puzzle(series: Dict, rng: random.Random, all_series: List[Dict] = None) -> Dict:
+def letter_shift_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'בחר את האופציה המתאימה לרשימה' – לוקח מספר מילים מתוך series,
     מחליף כל אות באות שלפניה (או אחריה) באלף-בית, ומבקש לנחש איזה מילה שייכת לסדרה.
@@ -471,7 +381,7 @@ def letter_shift_puzzle(series: Dict, rng: random.Random, all_series: List[Dict]
 
 
 @register
-def mysterious_equation_puzzle(rng: random.Random) -> Dict:
+def mysterious_equation_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'השלם את סימן השאלה' – יוצר רשימת שוויונות שבה צד ימין נגזר מצד שמאל
     לפי כלל אחד מתוך ארבעה (סכומי ספרות, מכפלה+סכום, ריבועים, הפרשים).
@@ -534,108 +444,47 @@ def mysterious_equation_puzzle(rng: random.Random) -> Dict:
     }
 
 
+# numeric_sequence_missing_puzzle (הגרסה התקינה)
 @register
-def numeric_sequence_missing_puzzle(rng: random.Random) -> Dict:
-    """
-    'השלם את סימן השאלה' – יוצר סדרה מספרית עם איבר חסר (שאלה 2).
-    בוחר אחד מחמישה סוגי סדרות.
-    """
-    series_type = rng.choice(
-        ["fibo", "arithmetic", "geometric", "digit_product", "cumulative_sum"]
-    )
-
-    seq = []
-    if series_type == "fibo":
-        a, b = rng.randint(1, 20), rng.randint(1, 20)
+def numeric_sequence_missing_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
+    seq_type = rng.choice(["arithmetic", "geometric", "fibonacci"])
+    length = 6
+    if seq_type == "arithmetic":
+        start = rng.randint(1, 20)
+        diff = rng.randint(1, 9)
+        seq = [start + i * diff for i in range(length)]
+        rule_desc = f"סדרה חשבונית (דלתא {diff})"
+    elif seq_type == "geometric":
+        start = rng.randint(1, 10)
+        ratio = rng.choice([2, 3])
+        seq = [start * (ratio ** i) for i in range(length)]
+        rule_desc = f"סדרה הנדסית (מכפלה {ratio})"
+    else:  # fibonacci
+        a, b = rng.randint(1, 10), rng.randint(1, 10)
         seq = [a, b]
-        for _ in range(4):
+        while len(seq) < length:
             seq.append(seq[-1] + seq[-2])
-
-    elif series_type == "arithmetic":
-        start = rng.randint(1, 50)
-        diff = rng.randint(2, 10)
-        seq = [start + diff * i for i in range(6)]
-
-    elif series_type == "geometric":
-        start = rng.randint(2, 6)
-        ratio = rng.randint(2, 4)
-        seq = [start * (ratio**i) for i in range(6)]
-
-    elif series_type == "digit_product":
-        n = rng.randint(21, 99)
-        seq = [n]
-        for _ in range(5):
-            prod = 1
-            for d in str(seq[-1]):
-                prod *= int(d)
-            seq.append(prod)
-
-    elif series_type == "cumulative_sum":
-        vals = [rng.randint(1, 20) for _ in range(6)]
-        running = []
-        total = 0
-        for v in vals:
-            total += v
-            running.append(total)
-        seq = running
-
-    # מסתיר איבר אקראי (לא הראשון)
-    idx = rng.randint(1, len(seq) - 2)
-    answer = seq[idx]
-    seq[idx] = "?"
-
-    question = ", ".join(map(str, seq))
+        rule_desc = "פיבונאצ'י"
+    hide_idx = rng.randrange(length)
+    answer = seq[hide_idx]
+    display_seq = [str(x) for x in seq]
+    display_seq[hide_idx] = "?"
     return {
-        "title": "השלם את סימן השאלה",
-        "question": question,
-        "hint": "גלה את החוקיות של הסדרה ומצא את המספר החסר",
-        "answer": str(answer),
-        "meta": {"series_type": series_type, "missing_index": idx},
-    }
-
-
-@register
-def next_palindrome_number_puzzle(rng: random.Random) -> Dict:
-    """
-    'בחר את האופציה המתאימה לרשימה' – מוצא את הפלינדרום הבא (או קודם) של מספר בן 3–5 ספרות.
-    """
-    direction = rng.choice(["next", "prev"])
-    num = rng.randint(100, 99999)
-
-    def is_pal(n: int) -> bool:
-        s = str(n)
-        return s == s[::-1]
-
-    step = 1 if direction == "next" else -1
-    candidate = num + step
-    while not is_pal(candidate):
-        candidate += step
-
-    question = f"{num} – מהו הפלינדרום ה{ 'הבא' if direction=='next' else 'הקודם' }?"
-    answer = str(candidate)
-
-    # הסחות – עוד שלושה מספרים אקראיים לא פלינדרומיים
-    distractors = []
-    while len(distractors) < 3:
-        d = rng.randint(num - 500, num + 500)
-        if not is_pal(d) and d != candidate:
-            distractors.append(str(d))
-
-    options = distractors + [answer]
-    rng.shuffle(options)
-
-    return {
-        "title": "בחר את האופציה המתאימה לרשימה",
-        "question": question,
-        "options": options,
+        "title": "סדרה חסרה – מה המספר החסר?",
+        "question": display_seq,
         "answer": answer,
-        "hint": "מספר שקוראים אותו אותו דבר משמאל לימין ומימין לשמאל",
-        "meta": {"direction": direction, "base_number": num},
+        "hint": f"שימי לב: זו {rule_desc}.",
+        "options": None,
+        "meta": {
+            "seq_type": seq_type,
+            "full_sequence": seq,
+            "hidden_index": hide_idx
+        }
     }
 
 
 @register
-def quirky_equation_puzzle(rng: random.Random) -> Dict:
+def quirky_equation_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'בחר את האופציה המתאימה לרשימה' – יוצר 3–4 שוויונות עם כלל חישוב נסתר,
     ומבקש לפתור את השוויון האחרון.
@@ -654,6 +503,7 @@ def quirky_equation_puzzle(rng: random.Random) -> Dict:
             return (a + b) * 3
         if rule == "digit_prod_plus":
             return (a * b) + (a + b)
+        return 0  # ברירת מחדל
 
     equations = []
     for _ in range(3):
@@ -676,7 +526,7 @@ def quirky_equation_puzzle(rng: random.Random) -> Dict:
 
 
 @register
-def digit_count_range_puzzle(rng: random.Random) -> Dict:
+def digit_count_range_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'השלם את סימן השאלה' – שואל כמה מופעים של ספרה X יש בטווח A–B.
     """
@@ -696,7 +546,7 @@ def digit_count_range_puzzle(rng: random.Random) -> Dict:
     }
 
 @register
-def digit_sum_product_puzzle(rng: random.Random) -> Dict:
+def digit_sum_product_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'השלם את השוויון' – שתי ספרות: התוצאה היא (חיבור הספרות)(כפל הספרות).
     לדוגמה: 2 3 → 5 6  |  5 8 → 13 40
@@ -723,7 +573,7 @@ def digit_sum_product_puzzle(rng: random.Random) -> Dict:
 
 
 @register
-def digit_ops_combo_puzzle(rng: random.Random) -> Dict:
+def digit_ops_combo_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'השלם את השוויון – גרסה משוגעת'  
     בוחר אקראית שתי פעולות על הספרות (⊕ , ⊗) ומצמיד את התוצאות.
@@ -768,7 +618,7 @@ def digit_ops_combo_puzzle(rng: random.Random) -> Dict:
     }
 
 @register
-def digit_sum_plus_product_puzzle(rng: random.Random) -> Dict:
+def digit_sum_plus_product_puzzle(series: Dict, rng: random.Random, all_series: Optional[List[Dict]] = None) -> Dict:
     """
     'השלם את השוויון' – שתי ספרות: סכום הספרות + מכפלת הספרות.
     לדוגמה: 5 8 → (5+8) + (5*8) = 13 + 40 = 53
@@ -794,17 +644,12 @@ def digit_sum_plus_product_puzzle(rng: random.Random) -> Dict:
     }
 
 
-# מניח שקיים דקורטור register במודול שלכם
-def register(fn):  # מחיקה כשתשתמשו בדקורטור האמיתי
-    return fn
-
-
 # -------------------------------------------------
 # 1. סדרת מספרים חסרה / המשך סדרה
 # -------------------------------------------------
 @register
 def numeric_sequence_missing_puzzle(series: Dict, rng: random.Random,
-                                    all_series: List[Dict] = None) -> Dict:
+                                    all_series: Optional[List[Dict]] = None) -> Dict:
     """
     יוצרת רצף בן 6 איברים עם איבר חסר אחד (?). הסוג נבחר אקראית.
     """
@@ -831,7 +676,7 @@ def numeric_sequence_missing_puzzle(series: Dict, rng: random.Random,
     hide_idx = rng.randrange(length)
     answer = seq[hide_idx]
     display_seq = seq.copy()
-    display_seq[hide_idx] = "?"
+    display_seq[hide_idx] = None  # במקום "?"
 
     return {
         "title": "סדרה חסרה – מה המספר החסר?",
@@ -852,7 +697,7 @@ def numeric_sequence_missing_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def hidden_operation_equation_puzzle(series: Dict, rng: random.Random,
-                                     all_series: List[Dict] = None) -> Dict:
+                                     all_series: Optional[List[Dict]] = None) -> Dict:
     """
     יוצר 3 “משוואות” עם כלל נסתר, ומבקש להשלים זוג אחרון.
     כלל אפשרי: ax + by + c, כאשר a,b,c קבועים אקראיים קטנים.
@@ -903,7 +748,7 @@ def hidden_operation_equation_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def word_length_number_puzzle(series: Dict, rng: random.Random,
-                              all_series: List[Dict] = None) -> Dict:
+                              all_series: Optional[List[Dict]] = None) -> Dict:
     """
     נותן רשימת מילים עבריות; המספר הוא מספר האותיות במילה.
     המשתמש צריך למצוא את המספר המתאים למילה האחרונה.
@@ -936,16 +781,12 @@ def word_length_number_puzzle(series: Dict, rng: random.Random,
     }
 
 
-def register(fn):  # למחיקה כשהדקורטור האמיתי זמין
-    return fn
-
-
 # -------------------------------------------------
 # 4. ספירת תכונה בספרות – כמה ספרות זוגיות?
 # -------------------------------------------------
 @register
 def even_digit_count_puzzle(series: Dict, rng: random.Random,
-                            all_series: List[Dict] = None) -> Dict:
+                            all_series: Optional[List[Dict]] = None) -> Dict:
     nums = []
     while len(nums) < 4:
         n = rng.randint(100, 999)
@@ -981,7 +822,7 @@ def even_digit_count_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def digit_sum_puzzle(series: Dict, rng: random.Random,
-                     all_series: List[Dict] = None) -> Dict:
+                     all_series: Optional[List[Dict]] = None) -> Dict:
     nums = rng.sample(range(200, 999), 4)
 
     def digit_sum(x):
@@ -1014,7 +855,7 @@ def digit_sum_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def digit_product_puzzle(series: Dict, rng: random.Random,
-                         all_series: List[Dict] = None) -> Dict:
+                         all_series: Optional[List[Dict]] = None) -> Dict:
     nums = rng.sample(range(112, 987), 4)
 
     def digit_prod(x):
@@ -1053,7 +894,7 @@ def digit_product_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def sum_prod_concat_puzzle(series: Dict, rng: random.Random,
-                           all_series: List[Dict] = None) -> Dict:
+                           all_series: Optional[List[Dict]] = None) -> Dict:
     nums = rng.sample(range(12, 98), 4)  # דו-ספרתי קליל
 
     def transform(n):
@@ -1090,7 +931,7 @@ def sum_prod_concat_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def square_concat_puzzle(series: Dict, rng: random.Random,
-                         all_series: List[Dict] = None) -> Dict:
+                         all_series: Optional[List[Dict]] = None) -> Dict:
     nums = rng.sample(range(12, 98), 4)
 
     def transform(n):
@@ -1119,12 +960,6 @@ def square_concat_puzzle(series: Dict, rng: random.Random,
         "meta": {"pairs": pairs}
     }
 
-import random
-from typing import Dict, List
-
-def register(fn):  # להסרה כשיש את הדקורטור שלכם
-    return fn
-
 
 # -------------------------------------------------
 # 9. סדרה עם חוק מתחלף:  (-K) , אחר-כך (x-M) , וחוזר חלילה
@@ -1132,7 +967,7 @@ def register(fn):  # להסרה כשיש את הדקורטור שלכם
 # -------------------------------------------------
 @register
 def alternating_rule_sequence_puzzle(series: Dict, rng: random.Random,
-                                     all_series: List[Dict] = None) -> Dict:
+                                     all_series: Optional[List[Dict]] = None) -> Dict:
     """
     יוצר סדרה באורך 8-10 שבה החוק מתחלף:
       צעד אי-זוגי: מחסירים K
@@ -1155,7 +990,7 @@ def alternating_rule_sequence_puzzle(series: Dict, rng: random.Random,
 
     hide_idx = rng.randrange(3, length - 1)  # מסתירים איבר פנימי
     answer = seq[hide_idx]
-    display = seq.copy()
+    display = [str(x) for x in seq]
     display[hide_idx] = "?"
 
     return {
@@ -1174,7 +1009,7 @@ def alternating_rule_sequence_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def linear_io_table_puzzle(series: Dict, rng: random.Random,
-                           all_series: List[Dict] = None) -> Dict:
+                           all_series: Optional[List[Dict]] = None) -> Dict:
     """
     יוצר כלל y = ax + b עם a,b שלמים קטנים.
     מציג 6-7 זוגות, חלקם חסרים, ומבקש למלא.
@@ -1218,7 +1053,7 @@ def linear_io_table_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def quadratic_sequence_puzzle(series: Dict, rng: random.Random,
-                              all_series: List[Dict] = None) -> Dict:
+                              all_series: Optional[List[Dict]] = None) -> Dict:
     """
     יוצר סדרה באורך 7 לפי הנוסחה  n² ± c  (c קבוע קטן).
     מסתיר איבר אמצעי.
@@ -1228,12 +1063,10 @@ def quadratic_sequence_puzzle(series: Dict, rng: random.Random,
     seq = [(n ** 2) + c for n in range(length)]
     hide_idx = rng.randrange(2, 5)
     answer = seq[hide_idx]
-    display = seq.copy()
+    display = [str(x) for x in seq]
     display[hide_idx] = "?"
-
     sign = "+" if c > 0 else "-"
     abs_c = abs(c)
-
     return {
         "title": "סדרה ריבועית – מה המספר החסר?",
         "question": display,
@@ -1250,7 +1083,7 @@ def quadratic_sequence_puzzle(series: Dict, rng: random.Random,
 # -------------------------------------------------
 @register
 def two_step_linear_sequence_puzzle(series: Dict, rng: random.Random,
-                                    all_series: List[Dict] = None) -> Dict:
+                                    all_series: Optional[List[Dict]] = None) -> Dict:
     """
     בוחר a,b (a≠0), מייצר 5-6 זוגות x→y לא רציפים.
     משתמש בשניים-שלושה זוגות להדגמת הכלל, מסתיר את היתר.
